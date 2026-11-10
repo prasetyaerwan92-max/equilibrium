@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQUILIBRIUM LAB - Laboratorium Virtual Kesetimbangan Kimia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            900: '#0a0f1d',
+                            800: '#111827',
+                            700: '#1e293b',
+                            600: '#334155'
+                        },
+                        electric: {
+                            500: '#3b82f6',
+                            400: '#60a5fa',
+                            300: '#93c5fd'
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            300: '#67e8f9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome CDN for Chemistry & UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Dynamic Equilibrium Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0f1d;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.35);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0f1d;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+        .beaker-liquid {
+            transition: all 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-navy-900 text-slate-100">
+
+    <!-- TOP MOBILE NAVIGATION -->
+    <header class="lg:hidden flex items-center justify-between p-4 bg-navy-800 border-b border-cyan-500/20 sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-cyan-500/20 rounded-lg text-cyan-400">
+                <i class="fa-solid fa-atom text-xl animate-spin" style="animation-duration: 8s;"></i>
+            </div>
+            <span class="font-bold text-lg tracking-wider text-cyan-400">EQUILIBRIUM <span class="text-white">LAB</span></span>
+        </div>
+        <button id="mobile-menu-btn" class="p-2 text-slate-300 hover:text-cyan-400 focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+    </header>
+
+    <div class="flex flex-1 relative">
+        <!-- SIDEBAR NAVIGATION (Desktop & Mobile Drawer) -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-navy-800/95 backdrop-blur-md border-r border-cyan-500/20 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between lg:static">
+            <div>
+                <!-- Brand Header -->
+                <div class="hidden lg:flex items-center space-x-3 p-6 border-b border-slate-700/50">
+                    <div class="p-2.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl text-white shadow-lg shadow-cyan-500/30">
+                        <i class="fa-solid fa-flask text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">EQUILIBRIUM</h1>
+                        <p class="text-xs text-slate-400 font-medium">Virtual Chemistry Lab</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-180px)]">
+                    <a href="#home" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-house w-5 text-center"></i> <span>Beranda</span>
+                    </a>
+                    <a href="#objectives" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-bullseye w-5 text-center"></i> <span>Tujuan Pembelajaran</span>
+                    </a>
+                    <a href="#basics" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-book-open w-5 text-center"></i> <span>Materi Kesetimbangan</span>
+                    </a>
+                    <a href="#lechatelier" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-scale-balanced w-5 text-center"></i> <span>Asas Le Chatelier</span>
+                    </a>
+                    <a href="#factors" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-sliders w-5 text-center"></i> <span>Faktor Pergeseran</span>
+                    </a>
+                    <a href="#vlab" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium text-cyan-400 bg-cyan-500/10 border border-cyan-500/30">
+                        <i class="fa-solid fa-vial-circle-check w-5 text-center"></i> <span>Laboratorium Virtual</span>
+                    </a>
+                    <a href="#examples" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-lightbulb w-5 text-center"></i> <span>Contoh &amp; Pembahasan</span>
+                    </a>
+                    <a href="#quiz" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-gamepad w-5 text-center"></i> <span>Kuis Interaktif</span>
+                    </a>
+                    <a href="#evaluation" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-clipboard-check w-5 text-center"></i> <span>Evaluasi Akhir</span>
+                    </a>
+                    <a href="#glossary" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-cyan-400 font-medium">
+                        <i class="fa-solid fa-spell-check w-5 text-center"></i> <span>Glosarium</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Progress Summary Sidebar -->
+            <div class="p-4 border-t border-slate-700/50">
+                <div class="glass-panel p-3 rounded-xl">
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span class="text-slate-400">Progres Pembelajaran</span>
+                        <span id="sidebar-progress-text" class="text-cyan-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
+                        <div id="sidebar-progress-bar" class="bg-gradient-to-r from-cyan-400 to-blue-500 h-full w-0 transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 p-4 lg:p-8 overflow-y-auto max-w-7xl mx-auto">
+            
+            <!-- SECTION: BERANDA -->
+            <section id="home-section" class="page-section space-y-8">
+                <!-- Hero Banner -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-navy-800 via-slate-900 to-navy-800 border border-cyan-500/30 p-8 lg:p-12 shadow-2xl">
+                    <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -left-10 -top-10 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl"></div>
+
+                    <div class="grid lg:grid-cols-2 gap-8 items-center relative z-10">
+                        <div class="space-y-6">
+                            <span class="px-4 py-1.5 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold tracking-widest uppercase border border-cyan-500/30">
+                                <i class="fa-solid fa-microscope mr-2"></i>Media Pembelajaran Kimia XI SMA/MA
+                            </span>
+                            <h1 class="text-4xl lg:text-6xl font-extrabold tracking-tight">
+                                Laboratorium Virtual <br>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400">Kesetimbangan Kimia</span>
+                            </h1>
+                            <p class="text-slate-300 text-lg leading-relaxed">
+                                Jelajahi secara visual bagaimana perubahan <strong>suhu, tekanan, volume, dan konsentrasi</strong> menggeser kesetimbangan reaksi kimia berdasarkan Asas Le Chatelier secara simulatif dan real-time.
+                            </p>
+                            <div class="flex flex-wrap gap-4 pt-2">
+                                <a href="#vlab" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg shadow-cyan-500/25 transition transform hover:-translate-y-0.5 flex items-center space-x-2">
+                                    <i class="fa-solid fa-vial"></i> <span>MASUK LABORATORIUM</span>
+                                </a>
+                                <a href="#objectives" class="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 font-bold transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-circle-play"></i> <span>MULAI BELAJAR</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Molecule Animation Canvas -->
+                        <div class="flex justify-center items-center relative">
+                            <canvas id="hero-molecule-canvas" class="w-full h-72 rounded-2xl border border-slate-700/50 bg-navy-900/60"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prompting Question Card -->
+                <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-cyan-400 space-y-3">
+                    <div class="flex items-center space-x-3 text-cyan-400 font-bold text-lg">
+                        <i class="fa-solid fa-circle-question text-2xl"></i>
+                        <h3>Pertanyaan Pemantik Tantangan:</h3>
+                    </div>
+                    <blockquote class="text-xl italic text-slate-200 font-medium">
+                        "Mengapa perubahan suhu, tekanan, atau konsentrasi dapat menyebabkan suatu reaksi kimia bergeser ke arah tertentu, dan bagaimana industri memanfaatkannya untuk hasil maksimal?"
+                    </blockquote>
+                    <p class="text-sm text-slate-400">Temukan jawabannya dengan mencoba langsung di simulasi laboratorium interaktif pada aplikasi ini!</p>
+                </div>
+
+                <!-- Feature Grid & Summary -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl hover:border-cyan-500/50 transition">
+                        <div class="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                            <i class="fa-solid fa-vial-virus"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Simulasi Interaktif</h4>
+                        <p class="text-slate-400 text-sm">Ubah variabel suhu, konsentrasi, tekanan &amp; volume lalu amati perubahan visual reaksi.</p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl hover:border-cyan-500/50 transition">
+                        <div class="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Grafik &amp; Analogi Jungkat-Jungkit</h4>
+                        <p class="text-slate-400 text-sm">Pantau kurva konsentrasi real-time beserta animasi jungkat-jungkit arah pergeseran.</p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl hover:border-cyan-500/50 transition">
+                        <div class="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Evaluasi Terukur</h4>
+                        <p class="text-slate-400 text-sm">Uji pemahaman Anda melalui kuis latihan dan evaluasi akhir berskor instan bertimer.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: TUJUAN PEMBELAJARAN -->
+            <section id="objectives-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-bullseye"></i> <span>Tujuan Pembelajaran</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">Capaian pembelajaran materi Kesetimbangan Kimia kelas XI SMA/MA</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">01</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Konsep Kesetimbangan Dinamis</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menjelaskan konsep kesetimbangan kimia dinamis saat laju reaksi maju sama dengan laju reaksi balik.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">02</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Reaksi Reversibel vs Irreversibel</h4>
+                            <p class="text-slate-400 text-sm mt-1">Membedakan karakteristik reaksi searah (berkesudahan) dan reaksi dua arah (bolak-balik).</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">03</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Kesetimbangan Homogen &amp; Heterogen</h4>
+                            <p class="text-slate-400 text-sm mt-1">Mengklasifikasikan kesetimbangan berdasarkan wujud zat reaktan dan produk.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">04</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Memahami Asas Le Chatelier</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menjelaskan prinsip aksi-reaksi sistem kesetimbangan saat menerima gangguan luar.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">05</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Pengaruh Konsentrasi</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menganalisis efek penambahan atau pengurangan zat reaktan/produk terhadap arah pergeseran.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">06</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Pengaruh Suhu</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menganalisis pergeseran kesetimbangan pada reaksi endoterm dan eksoterm saat suhu diubah.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">07</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Pengaruh Tekanan &amp; Volume</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menganalisis pergeseran pada sistem kesetimbangan gas berdasarkan selisih mol gas.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">08</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Peran Katalis</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menjelaskan fungsi katalis mempercepat tercapainya kesetimbangan tanpa mengubah posisi pergeserannya.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">09</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Prediksi Arah Pergeseran</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menentukan secara tepat arah pergeseran (ke reaktan atau produk) akibat aksi luar.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-slate-700/80 flex items-start space-x-4">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-lg font-bold">10</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Aplikasi Industri</h4>
+                            <p class="text-slate-400 text-sm mt-1">Menerapkan prinsip pergeseran pada Proses Haber-Bosch (Amonia) dan Proses Kontak (Asam Sulfat).</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: MATERI KESETIMBANGAN -->
+            <section id="basics-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-book-open"></i> <span>Materi Kesetimbangan Kimia</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">Konsep Dasar Reaksi Bolak-Balik dan Kesetimbangan Dinamis</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Reaksi Reversibel vs Irreversibel -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h3 class="text-xl font-bold text-cyan-300 flex items-center space-x-2">
+                            <i class="fa-solid fa-arrows-left-right"></i> <span>1. Reaksi Reversibel vs Irreversibel</span>
+                        </h3>
+                        <div class="space-y-3 text-slate-300 text-sm leading-relaxed">
+                            <p><strong class="text-white">Reaksi Irreversibel (Satu Arah):</strong> Reaksi berlangsung berkesudahan sampai salah satu reaktan habis. Hasil reaksi tidak dapat kembali menjadi reaktan.</p>
+                            <div class="bg-navy-900 p-3 rounded-lg font-mono text-cyan-400 text-xs">
+                                NaOH(aq) + HCl(aq) → NaCl(aq) + H₂O(l)
+                            </div>
+                            <p><strong class="text-white">Reaksi Reversibel (Dua Arah):</strong> Hasil reaksi dapat bereaksi kembali membentuk reaktan. Menggunakan tanda panah bolak-balik (⇌).</p>
+                            <div class="bg-navy-900 p-3 rounded-lg font-mono text-cyan-400 text-xs">
+                                N₂(g) + 3H₂(g) ⇌ 2NH₃(g)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kesetimbangan Dinamis -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h3 class="text-xl font-bold text-cyan-300 flex items-center space-x-2">
+                            <i class="fa-solid fa-rotate text-cyan-400"></i> <span>2. Konsep Kesetimbangan Dinamis</span>
+                        </h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Keadaan setimbang dicapai apabila <strong>laju pembentukan produk (v<sub>1</sub>) sama dengan laju pembentukan reaktan kembali (v<sub>2</sub>)</strong>. 
+                        </p>
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-500/20 text-center">
+                            <span class="text-cyan-400 font-bold text-lg">Laju Reaksi Maju (v<sub>1</sub>) = Laju Reaksi Balik (v<sub>2</sub>)</span>
+                        </div>
+                        <ul class="list-disc list-inside text-xs text-slate-300 space-y-1">
+                            <li>Secara <strong>makroskopis</strong> reaksi tampak telah berhenti (tidak ada perubahan warna atau konsentrasi).</li>
+                            <li>Secara <strong>mikroskopis</strong> reaksi terus berlangsung dua arah secara konstan.</li>
+                            <li>Terjadi pada <strong>sistem tertutup</strong> dengan suhu dan tekanan konstan.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Kesetimbangan Homogen & Heterogen -->
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="text-xl font-bold text-cyan-300">3. Jenis Kesetimbangan Berdasarkan Wujud (Fase)</h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-navy-900/80 p-4 rounded-xl border border-slate-700">
+                            <h4 class="font-bold text-cyan-400 mb-2">A. Kesetimbangan Homogen</h4>
+                            <p class="text-slate-300 mb-2">Seluruh zat reaktan dan produk memiliki wujud (fase) yang sama.</p>
+                            <p class="font-mono text-xs text-amber-300">2NO₂(g) ⇌ N₂O₄(g) (Fase Gas)</p>
+                        </div>
+                        <div class="bg-navy-900/80 p-4 rounded-xl border border-slate-700">
+                            <h4 class="font-bold text-cyan-400 mb-2">B. Kesetimbangan Heterogen</h4>
+                            <p class="text-slate-300 mb-2">Zat-zat dalam reaksi memiliki wujud (fase) yang berbeda-beda.</p>
+                            <p class="font-mono text-xs text-amber-300">CaCO₃(s) ⇌ CaO(s) + CO₂(g) (Padat &amp; Gas)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: ASAS LE CHATELIER -->
+            <section id="lechatelier-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-scale-balanced"></i> <span>Asas Le Chatelier</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">Prinsip dasar pergeseran posisi kesetimbangan kimia</p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-cyan-500/40 relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <div class="p-6 bg-cyan-500/20 text-cyan-400 rounded-full text-5xl flex-shrink-0">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="text-2xl font-bold text-white">Bunyi Asas Le Chatelier (1884):</h3>
+                            <blockquote class="text-xl font-serif italic text-cyan-300 bg-navy-900/90 p-4 rounded-xl border-l-4 border-cyan-400">
+                                "Jika pada suatu sistem kesetimbangan diberikan suatu AKSI (gangguan), maka sistem tersebut akan memberikan REAKSI untuk meminimalkan pengaruh gangguan tersebut sehingga kesetimbangan baru tercapai kembali."
+                            </blockquote>
+                            <p class="text-sm text-slate-300">
+                                Singkatnya: <strong class="text-cyan-400">Sistem akan merespons aksi luar dengan berusaha menetralkannya.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analog Visual Timbangan -->
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="text-xl font-bold text-cyan-300">Analogi Sederhana: Jungkat-Jungkit</h3>
+                    <p class="text-slate-300 text-sm">
+                        Bayangkan dua sisi: Kiri (Pereaksi) dan Kanan (Produk). Jika konsentrasi reaktan ditambah, beban kiri bertambah berat. Untuk menetapkannya kembali seimbang, sistem akan mengalirkan materi ke kanan (reaksi bergeser ke kanan).
+                    </p>
+                    <div class="flex justify-center p-6 bg-navy-900 rounded-xl">
+                        <div class="text-center space-y-2">
+                            <div class="flex items-center justify-center space-x-8 text-2xl font-bold text-cyan-400">
+                                <span>PEREAKSI</span>
+                                <i class="fa-solid fa-arrow-right-long text-amber-400 animate-pulse"></i>
+                                <span>PRODUK</span>
+                            </div>
+                            <p class="text-xs text-slate-400">Aksi: Tambah Reaktan → Reaksi: Bergeser ke Kanan (membentuk lebih banyak Produk)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: FAKTOR PERGESERAN -->
+            <section id="factors-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-sliders"></i> <span>Faktor-Faktor Pergeseran Kesetimbangan</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">4 Faktor Utama Pengubah Arah Kesetimbangan dan Aplikasi Industri</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Faktor 1: Konsentrasi -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-cyan-400 space-y-3">
+                        <div class="flex items-center space-x-3 text-cyan-400">
+                            <i class="fa-solid fa-flask text-2xl"></i>
+                            <h3 class="font-bold text-lg text-white">1. Pengaruh Konsentrasi</h3>
+                        </div>
+                        <ul class="space-y-2 text-sm text-slate-300">
+                            <li class="bg-navy-900/60 p-2.5 rounded-lg border border-slate-800">
+                                <strong class="text-cyan-400">Konsentrasi Ditambah:</strong> Reaksi bergeser <strong>MENJAUHI</strong> zat yang ditambah.
+                            </li>
+                            <li class="bg-navy-900/60 p-2.5 rounded-lg border border-slate-800">
+                                <strong class="text-cyan-400">Konsentrasi Dikurangi:</strong> Reaksi bergeser <strong>MENDEKATI (KE ARAH)</strong> zat yang dikurangi.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Faktor 2: Suhu -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-amber-400 space-y-3">
+                        <div class="flex items-center space-x-3 text-amber-400">
+                            <i class="fa-solid fa-temperature-high text-2xl"></i>
+                            <h3 class="font-bold text-lg text-white">2. Pengaruh Suhu (ΔH)</h3>
+                        </div>
+                        <ul class="space-y-2 text-sm text-slate-300">
+                            <li class="bg-navy-900/60 p-2.5 rounded-lg border border-slate-800">
+                                <strong class="text-amber-400">Suhu Dinaikkan:</strong> Reaksi bergeser ke arah <strong>ENDOTERM</strong> (ΔH = +, menyerap kalor).
+                            </li>
+                            <li class="bg-navy-900/60 p-2.5 rounded-lg border border-slate-800">
+                                <strong class="text-amber-400">Suhu Diturunkan:</strong> Reaksi bergeser ke arah <strong>EKSOTERM</strong> (ΔH = −, melepas kalor).
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Faktor 3: Tekanan & Volume -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-blue-400 space-y-3">
+                        <div class="flex items-center space-x-3 text-blue-400">
+                            <i class="fa-solid fa-compress text-2xl"></i>
+                            <h3 class="font-bold text-lg text-white">3. Pengaruh Tekanan &amp; Volume (Khusus Gas)</h3>
+                        </div>
+                        <p class="text-xs text-slate-400">Tekanan dan Volume berbanding terbalik (P ∝ 1/V).</p>
+                        <ul class="space-y-2 text-sm text-slate-300">
+                            <li class="bg-navy-900/60 p-2.5 rounded-lg border border-slate-800">
+                                <strong class="text-blue-400">Tekanan Perbesar / Vol Perkecil:</strong> Bergeser ke arah mol gas <strong>LEBIH KECIL</strong>.
+                            </li>
+                            <li class="bg-navy-900/60 p-2.5 rounded-lg border border-slate-800">
+                                <strong class="text-blue-400">Tekanan Perkecil / Vol Perbesar:</strong> Bergeser ke arah mol gas <strong>LEBIH BESAR</strong>.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Faktor 4: Katalis -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-purple-400 space-y-3">
+                        <div class="flex items-center space-x-3 text-purple-400">
+                            <i class="fa-solid fa-bolt text-2xl"></i>
+                            <h3 class="font-bold text-lg text-white">4. Pengaruh Katalis</h3>
+                        </div>
+                        <p class="text-sm text-slate-300">
+                            Katalis <strong>TIDAK MENGGESER</strong> kesetimbangan dan tidak mengubah jumlah relatif reaktan/produk.
+                        </p>
+                        <div class="bg-navy-900/60 p-3 rounded-lg border border-slate-800 text-xs text-slate-300">
+                            Katalis hanya <strong>mempercepat laju reaksi maju dan balik secara seimbang</strong> dengan menurunkan energi aktivasi (E<sub>a</sub>), sehingga kesetimbangan tercapai <strong>lebih cepat</strong>.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aplikasi Industri -->
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="text-xl font-bold text-cyan-300 flex items-center space-x-2">
+                        <i class="fa-solid fa-industry"></i> <span>Aplikasi Dalam Industri Kimia</span>
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-navy-900 p-4 rounded-xl border border-cyan-500/30">
+                            <h4 class="font-bold text-cyan-400 text-base">A. Proses Haber-Bosch (Pembuatan Amonia NH₃)</h4>
+                            <p class="text-xs font-mono text-amber-300 my-1">N₂(g) + 3H₂(g) ⇌ 2NH₃(g) ΔH = −92 kJ</p>
+                            <p class="text-slate-300 text-xs mt-2">
+                                Agar hasil NH₃ maksimal:
+                                <br>&bull; Tekanan tinggi (± 200 atm) → Koefisien kanan (2) &lt; Kiri (4).
+                                <br>&bull; Suhu optimum (± 400–500 °C) + Katalis Serbuk Besi (Fe).
+                            </p>
+                        </div>
+                        <div class="bg-navy-900 p-4 rounded-xl border border-cyan-500/30">
+                            <h4 class="font-bold text-cyan-400 text-base">B. Proses Kontak (Pembuatan Asam Sulfat H₂SO₄)</h4>
+                            <p class="text-xs font-mono text-amber-300 my-1">2SO₂(g) + O₂(g) ⇌ 2SO₃(g) ΔH = −197 kJ</p>
+                            <p class="text-slate-300 text-xs mt-2">
+                                Tahap penentu SO₃:
+                                <br>&bull; Katalis V₂O₅ (Vanadium Pentoksida).
+                                <br>&bull; Tekanan 1 atm (menghasilkan produk ±98%) &amp; Suhu ± 450 °C.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: LABORATORIUM VIRTUAL (SIMULATOR REVISI UTAMA) -->
+            <section id="vlab-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                            <i class="fa-solid fa-vial-circle-check"></i> <span>Laboratorium Virtual Kesetimbangan</span>
+                        </h2>
+                        <p class="text-slate-400 mt-1">Uji coba pergeseran kesetimbangan dengan 4 faktor Le Chatelier</p>
+                    </div>
+                    <!-- Select Reaction System -->
+                    <div class="flex items-center space-x-2 bg-slate-800 p-2 rounded-xl border border-cyan-500/30">
+                        <label for="reaction-select" class="text-xs font-bold text-cyan-400 whitespace-nowrap">Pilih Reaksi:</label>
+                        <select id="reaction-select" class="bg-navy-900 text-slate-100 text-sm font-semibold rounded-lg px-3 py-1.5 outline-none border border-slate-700 focus:border-cyan-400">
+                            <option value="fe-scn">1. Fe³⁺ + SCN⁻ ⇌ [Fe(SCN)]²⁺ (Larutan Kompleks Merah)</option>
+                            <option value="no2-n2o4">2. 2NO₂ ⇌ N₂O₄ (Gas NO₂ Cokelat / N₂O₄ Bening)</option>
+                            <option value="haber">3. N₂ + 3H₂ ⇌ 2NH₃ (Sintesis Amonia Haber-Bosch)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Simulation Main Layout Grid -->
+                <div class="grid lg:grid-cols-12 gap-6">
+                    
+                    <!-- LEFT COLUMN: CONTROLS (5 Cols) -->
+                    <div class="lg:col-span-5 space-y-5">
+                        <!-- Card Kontrol Variabel 4 Faktor -->
+                        <div class="glass-panel p-5 rounded-2xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                                <h3 class="font-bold text-lg text-cyan-300">
+                                    <i class="fa-solid fa-sliders mr-2"></i>Kontrol 4 Faktor Pergeseran
+                                </h3>
+                                <button id="reset-sim-btn" class="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/30 transition">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+                                </button>
+                            </div>
+
+                            <!-- Form Kontrol Interaktif (Dynamic HTML) -->
+                            <div id="sim-controls-container" class="space-y-4">
+                                <!-- Interaktif 4 faktor injected by JS -->
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="pt-2 flex gap-2">
+                                <button id="apply-sim-btn" class="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/20 transition flex items-center justify-center space-x-2 text-sm">
+                                    <i class="fa-solid fa-flask-vial"></i> <span>Terapkan Perubahan</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status & Shift Output Panel (Analisis Otomatis) -->
+                        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-cyan-400 space-y-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">1. Indikator Arah Pergeseran</span>
+                            <div id="shift-badge-container" class="flex items-center">
+                                <span id="shift-direction-badge" class="px-3.5 py-1.5 rounded-full text-sm font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                    TIDAK TERJADI PERGESERAN (SETIMBANG)
+                                </span>
+                            </div>
+                            
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block pt-1">2. Alasan (Asas Le Chatelier)</span>
+                            <p id="shift-explanation-text" class="text-xs text-slate-300 leading-relaxed bg-navy-900/60 p-3 rounded-xl border border-slate-800">
+                                Sistem berada dalam kondisi kesetimbangan dinamis awal.
+                            </p>
+
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block pt-1">3. Dampak Terhadap Jumlah Zat</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-700 text-slate-400">
+                                            <th class="py-1.5 px-2">Nama Zat</th>
+                                            <th class="py-1.5 px-2">Perubahan Jumlah (Setimbang Baru vs Awal)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sim-substance-table-body" class="divide-y divide-slate-800 text-slate-200">
+                                        <!-- Injected dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: VISUALIZATION, GRAFIK & JUNGKAT-JUNGKIT (7 Cols) -->
+                    <div class="lg:col-span-7 space-y-6">
+                        
+                        <!-- Reaction Formula Card -->
+                        <div class="glass-panel p-4 rounded-xl flex flex-wrap items-center justify-between border border-cyan-500/30 gap-2">
+                            <div>
+                                <span class="text-xs text-slate-400 block">Persamaan Reaksi Kesetimbangan:</span>
+                                <div id="sim-reaction-formula" class="text-lg font-bold text-cyan-300 font-mono">
+                                    Fe³⁺(aq) + SCN⁻(aq) ⇌ [Fe(SCN)]²⁺(aq)
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <span id="sim-reaction-type" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    Eksoterm (ΔH < 0)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Visual Lab Container (Tabung & Canvas Partikel) -->
+                        <div class="glass-panel p-5 rounded-2xl relative flex flex-col items-center justify-center overflow-hidden min-h-[260px]">
+                            <span class="absolute top-3 left-4 text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-flask-vial text-cyan-400"></i> Visualisasi Tabung Reaksi Mikroskopis
+                            </span>
+
+                            <div class="relative w-44 h-52 border-4 border-slate-400/50 border-t-0 rounded-b-3xl bg-slate-900/60 p-1 flex flex-col justify-end items-center overflow-hidden shadow-inner mt-4">
+                                <div id="vessel-fluid" class="w-full h-5/6 rounded-b-2xl beaker-liquid relative flex items-center justify-center">
+                                    <canvas id="vessel-canvas" class="w-full h-full absolute inset-0"></canvas>
+                                </div>
+                            </div>
+                            <span class="text-[11px] text-slate-400 mt-2 italic">*Ilustrasi konseptual perubahan visual partikel reaktan/produk</span>
+                        </div>
+
+                        <!-- ANALOGI JUNGKAT-JUNGKIT CANVAS INTERAKTIF -->
+                        <div class="glass-panel p-5 rounded-2xl space-y-3">
+                            <h4 class="text-sm font-bold text-slate-300 flex items-center justify-between">
+                                <span><i class="fa-solid fa-scale-balanced text-cyan-400 mr-2"></i>Analogi Jungkat-Jungkit Respon Sistem</span>
+                                <span id="seesaw-status-tag" class="text-xs font-normal px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Setimbang</span>
+                            </h4>
+                            <div class="h-36 relative flex justify-center items-center bg-navy-900/80 rounded-xl border border-slate-800">
+                                <canvas id="seesaw-canvas" class="w-full h-full"></canvas>
+                            </div>
+                            <p class="text-[11px] text-slate-400 italic">
+                                *Catatan: Jungkat-jungkit merupakan analogi konseptual untuk membantu memahami arah respons sistem terhadap gangguan. Dalam kesetimbangan kimia, jumlah pereaksi dan produk tidak harus sama. Kesetimbangan terjadi ketika laju reaksi maju sama dengan laju reaksi balik.
+                            </p>
+                        </div>
+
+                        <!-- GRAFIK KONSENTRASI TERHADAP WAKTU (CHART.JS) -->
+                        <div class="glass-panel p-5 rounded-2xl space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <h4 class="text-sm font-bold text-slate-300 flex items-center">
+                                    <i class="fa-solid fa-chart-line text-cyan-400 mr-2"></i>Grafik Konsentrasi vs Waktu
+                                </h4>
+                                <!-- Interactive Phase Buttons -->
+                                <div class="flex gap-1 text-[11px]">
+                                    <button onclick="setGraphExplanationPhase('before')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">1. Sebelum Gangguan</button>
+                                    <button onclick="setGraphExplanationPhase('during')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">2. Saat Gangguan</button>
+                                    <button onclick="setGraphExplanationPhase('after')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">3. Setelah Setimbang</button>
+                                </div>
+                            </div>
+
+                            <div class="h-52 relative">
+                                <canvas id="equilibrium-chart"></canvas>
+                            </div>
+
+                            <!-- Explanation Box for Chart -->
+                            <div id="chart-phase-explanation" class="p-3 bg-navy-900/80 rounded-xl border border-slate-800 text-xs text-slate-300">
+                                <strong class="text-cyan-400">Panduan Membaca Grafik:</strong> Garis mendatar menunjukkan sistem setimbang. Ketika gangguan terjadi, kurva naik/turun menunjukkan perubahan konsentrasi zat selama pergeseran hingga mendatar kembali.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: CONTOH SOAL DAN PEMBAHASAN -->
+            <section id="examples-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-lightbulb"></i> <span>Contoh Soal &amp; Pembahasan Step-by-Step</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">Latihan analitis pergeseran kesetimbangan berbasis HOTS</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Example 1 -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-lg border border-cyan-500/30">Soal 1</span>
+                            <h3 class="font-bold text-lg text-slate-100">Pengaruh Suhu pada Reaksi Sintesis Amonia</h3>
+                        </div>
+                        <p class="text-slate-300 text-sm">
+                            Diberikan reaksi kesetimbangan berikut:<br>
+                            <span class="font-mono text-cyan-300 font-bold">N₂(g) + 3H₂(g) ⇌ 2NH₃(g) ΔH = −92 kJ</span><br>
+                            Bagaimanakah arah pergeseran kesetimbangan jika suhu sistem <strong>dinaikkan</strong>? Jelaskan alasan dan pengaruhnya terhadap jumlah gas NH₃!
+                        </p>
+                        <button onclick="toggleAnswer('ans-1')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-bold rounded-xl border border-cyan-500/30 transition flex items-center space-x-2">
+                            <i class="fa-solid fa-eye"></i> <span>Lihat Pembahasan Lengkap</span>
+                        </button>
+                        <div id="ans-1" class="hidden bg-navy-900/90 p-4 rounded-xl border border-slate-700 text-sm space-y-2">
+                            <h4 class="font-bold text-cyan-400">Pembahasan Step-by-Step:</h4>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-300 text-xs">
+                                <li>Identifikasi nilai ΔH: Reaksi pembentukan NH₃ (ke kanan) bersifat Eksoterm (ΔH = −92 kJ), sedangkan reaksi balik ke kiri bersifat Endoterm.</li>
+                                <li>Berdasarkan Asas Le Chatelier, jika <strong>suhu dinaikkan</strong>, sistem akan merespon dengan menyerap kalor, sehingga kesetimbangan bergeser ke arah <strong>ENDOTERM</strong> (ke kiri / ke reaktan).</li>
+                                <li>Dampaknya: Jumlah gas NH₃ (produk) akan <strong>BERKURANG</strong>, sedangkan jumlah gas N₂ dan H₂ akan <strong>BERTAMBAH</strong>.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-lg border border-cyan-500/30">Soal 2</span>
+                            <h3 class="font-bold text-lg text-slate-100">Pengaruh Tekanan dan Volume Gas</h3>
+                        </div>
+                        <p class="text-slate-300 text-sm">
+                            Pada reaksi kesetimbangan gas:<br>
+                            <span class="font-mono text-cyan-300 font-bold">2SO₂(g) + O₂(g) ⇌ 2SO₃(g)</span><br>
+                            Jika volume wadah diperkecil (sehingga tekanan meningkat), ke manakah arah pergeseran kesetimbangan?
+                        </p>
+                        <button onclick="toggleAnswer('ans-2')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-bold rounded-xl border border-cyan-500/30 transition flex items-center space-x-2">
+                            <i class="fa-solid fa-eye"></i> <span>Lihat Pembahasan Lengkap</span>
+                        </button>
+                        <div id="ans-2" class="hidden bg-navy-900/90 p-4 rounded-xl border border-slate-700 text-sm space-y-2">
+                            <h4 class="font-bold text-cyan-400">Pembahasan Step-by-Step:</h4>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-300 text-xs">
+                                <li>Hitung jumlah koefisien (mol) gas di kedua ruas:
+                                    <br>&bull; Ruas Kiri (2SO₂ + O₂) = 2 + 1 = 3 mol gas.
+                                    <br>&bull; Ruas Kanan (2SO₃) = 2 mol gas.
+                                </li>
+                                <li>Jika <strong>volume diperkecil (tekanan diperbesar)</strong>, kesetimbangan akan bergeser ke ruas dengan <strong>jumlah mol gas LEBIH KECIL</strong>.</li>
+                                <li>Karena mol kanan (2) &lt; kiri (3), maka kesetimbangan akan <strong>BERGESER KE KANAN</strong> (ke arah pembentukan SO₃).</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: KUIS INTERAKTIF -->
+            <section id="quiz-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-gamepad"></i> <span>Kuis Interaktif Latihan</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">Uji pemahaman cepat Anda dengan umpan balik langsung</p>
+                </div>
+
+                <div id="quiz-container" class="glass-panel p-6 rounded-2xl space-y-6">
+                    <!-- Dynamic Quiz Content -->
+                </div>
+            </section>
+
+            <!-- SECTION: EVALUASI AKHIR -->
+            <section id="evaluation-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                            <i class="fa-solid fa-clipboard-check"></i> <span>Evaluasi Akhir Pembelajaran</span>
+                        </h2>
+                        <p class="text-slate-400 mt-1">Ujian pemahaman menyeluruh bertimer &amp; berskor otomatis</p>
+                    </div>
+                    <div id="eval-timer-badge" class="hidden px-4 py-2 bg-slate-800 border border-cyan-500/40 rounded-xl text-cyan-400 font-mono font-bold text-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-stopwatch animate-pulse"></i> <span id="eval-timer-text">10:00</span>
+                    </div>
+                </div>
+
+                <div id="eval-start-card" class="glass-panel p-8 rounded-2xl text-center space-y-6 max-w-xl mx-auto">
+                    <div class="w-20 h-20 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-cyan-500/40">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Siap Menguji Kemampuan Anda?</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Evaluasi ini terdiri dari 10 soal pilihan ganda HOTS. Nilai Ketuntasan Minimal (KKM) adalah 75. Anda diberi waktu terbatas 10 menit.
+                    </p>
+                    <button id="start-eval-btn" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 transition transform hover:-translate-y-0.5">
+                        MULAI EVALUASI AKHIR
+                    </button>
+                </div>
+
+                <!-- Active Exam Container -->
+                <div id="eval-exam-container" class="hidden space-y-6">
+                    <!-- Dynamic exam question list -->
+                </div>
+
+                <!-- Result Modal/Card -->
+                <div id="eval-result-card" class="hidden glass-panel p-8 rounded-2xl text-center space-y-6 max-w-xl mx-auto border-2">
+                    <!-- Dynamic results -->
+                </div>
+            </section>
+
+            <!-- SECTION: GLOSARIUM -->
+            <section id="glossary-section" class="page-section hidden space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-3xl font-extrabold text-cyan-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-spell-check"></i> <span>Glosarium Istilah Kesetimbangan</span>
+                    </h2>
+                    <p class="text-slate-400 mt-1">Kamus istilah kimia penting dalam materi kesetimbangan</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                    <input type="text" id="glossary-search" placeholder="Cari istilah kimia..." class="w-full bg-navy-800 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-slate-100 focus:outline-none focus:border-cyan-400 text-sm">
+                </div>
+
+                <div id="glossary-list" class="grid md:grid-cols-2 gap-4">
+                    <!-- Dynamic Glossary Cards -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           GLOBAL APP STATE & NAVIGATION
+           ========================================================================== */
+        const state = {
+            activePage: 'home',
+            completedSections: new Set(['home']),
+            totalSections: 10,
+            activeReactionKey: 'fe-scn',
+            simParams: {
+                targetSubstance: 'none', // Action substance
+                substanceAction: 'none', // 'add' or 'remove'
+                tempAction: 'normal',    // 'increase', 'decrease', 'normal'
+                pressureAction: 'normal',// 'increase', 'decrease', 'normal'
+                catalyst: false
+            },
+            simResult: {
+                direction: 'NONE', // 'RIGHT', 'LEFT', 'NONE'
+                explanation: 'Sistem berada dalam kondisi kesetimbangan dinamis awal.',
+                substanceChanges: {}
+            },
+            evalTimer: null,
+            evalTimeRemaining: 600
+        };
+
+        // Page Navigation Controller
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            const targetSection = document.getElementById(`${pageId}-section`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                state.activePage = pageId;
+                state.completedSections.add(pageId);
+                updateProgress();
+            }
+
+            // Update Active Sidebar Highlight
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href').replace('#', '');
+                if (href === pageId) {
+                    link.classList.add('bg-cyan-500/20', 'text-cyan-400', 'border', 'border-cyan-500/30');
+                } else {
+                    link.classList.remove('bg-cyan-500/20', 'text-cyan-400', 'border', 'border-cyan-500/30');
+                }
+            });
+
+            // Close Mobile Menu Drawer if open
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+
+            // Trigger specific canvas redraws on tab change
+            if (pageId === 'vlab') {
+                initEquilibriumChart();
+                updateSimulationVisuals();
+            }
+        }
+
+        // Progress Tracking
+        function updateProgress() {
+            const pct = Math.round((state.completedSections.size / state.totalSections) * 100);
+            document.getElementById('sidebar-progress-text').innerText = `${pct}%`;
+            document.getElementById('sidebar-progress-bar').style.width = `${pct}%`;
+        }
+
+        /* ==========================================================================
+           REACTION SIMULATION DATABASE & LE CHATELIER LOGIC ENGINE
+           ========================================================================== */
+        const reactionDatabase = {
+            'fe-scn': {
+                name: 'Fe³⁺ + SCN⁻ ⇌ [Fe(SCN)]²⁺',
+                formula: 'Fe³⁺(aq) + SCN⁻(aq) ⇌ [Fe(SCN)]²⁺(aq)',
+                deltaH: 'Eksoterm (ΔH < 0)',
+                isGas: false,
+                substances: [
+                    { id: 'fe', name: 'Fe³⁺', role: 'reactant', color: '#eab308' },
+                    { id: 'scn', name: 'SCN⁻', role: 'reactant', color: '#94a3b8' },
+                    { id: 'fescn', name: '[Fe(SCN)]²⁺', role: 'product', color: '#b91c1c' }
+                ]
+            },
+            'no2-n2o4': {
+                name: '2NO₂ ⇌ N₂O₄',
+                formula: '2NO₂(g) ⇌ N₂O₄(g)',
+                deltaH: 'Eksoterm (ΔH = −58 kJ)',
+                isGas: true,
+                leftMol: 2,
+                rightMol: 1,
+                substances: [
+                    { id: 'no2', name: 'NO₂', role: 'reactant', color: '#b45309' },
+                    { id: 'n2o4', name: 'N₂O₄', role: 'product', color: '#e2e8f0' }
+                ]
+            },
+            'haber': {
+                name: 'N₂ + 3H₂ ⇌ 2NH₃',
+                formula: 'N₂(g) + 3H₂(g) ⇌ 2NH₃(g)',
+                deltaH: 'Eksoterm (ΔH = −92 kJ)',
+                isGas: true,
+                leftMol: 4,
+                rightMol: 2,
+                substances: [
+                    { id: 'n2', name: 'N₂', role: 'reactant', color: '#3b82f6' },
+                    { id: 'h2', name: 'H₂', role: 'reactant', color: '#06b6d4' },
+                    { id: 'nh3', name: 'NH₃', role: 'product', color: '#a855f7' }
+                ]
+            }
+        };
+
+        let chartInstance = null;
+
+        function initEquilibriumChart() {
+            const ctx = document.getElementById('equilibrium-chart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['t₀ (Setimbang)', 't₁ (Gangguan)', 't₂ (Respon)', 't₃ (Setimbang Baru)'],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' }, beginAtZero: true, title: { display: true, text: 'Konsentrasi (M) [Ilustrasi Konseptual]', color: '#64748b', font: { size: 10 } } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function updateSimulationControlsUI() {
+            const key = state.activeReactionKey;
+            const rxn = reactionDatabase[key];
+            const container = document.getElementById('sim-controls-container');
+            
+            document.getElementById('sim-reaction-formula').innerHTML = rxn.formula;
+            document.getElementById('sim-reaction-type').innerHTML = rxn.deltaH;
+
+            let html = `
+                <!-- 1. Faktor Konsentrasi -->
+                <div class="space-y-2 bg-navy-900/60 p-3 rounded-xl border border-slate-800">
+                    <label class="text-xs font-bold text-cyan-400 block"><i class="fa-solid fa-flask mr-1"></i>1. Faktor Konsentrasi Zat</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="ctrl-substance-select" class="bg-slate-800 text-xs text-white rounded-lg p-2 outline-none border border-slate-700">
+                            <option value="none">-- Pilih Zat --</option>
+                            ${rxn.substances.map(s => `<option value="${s.id}">${s.name} (${s.role === 'reactant' ? 'Reaktan' : 'Produk'})</option>`).join('')}
+                        </select>
+                        <select id="ctrl-action-select" class="bg-slate-800 text-xs text-white rounded-lg p-2 outline-none border border-slate-700">
+                            <option value="none">-- Perlakuan --</option>
+                            <option value="add">Ditambahkan (+)</option>
+                            <option value="remove">Dikurangi (-)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. Faktor Suhu -->
+                <div class="space-y-2 bg-navy-900/60 p-3 rounded-xl border border-slate-800">
+                    <label class="text-xs font-bold text-amber-400 block"><i class="fa-solid fa-temperature-high mr-1"></i>2. Faktor Suhu Sistem</label>
+                    <select id="ctrl-temp-select" class="w-full bg-slate-800 text-xs text-white rounded-lg p-2 outline-none border border-slate-700">
+                        <option value="normal">Suhu Normal / Konstan</option>
+                        <option value="increase">Suhu Dinaikkan (Ke arah Endoterm)</option>
+                        <option value="decrease">Suhu Diturunkan (Ke arah Eksoterm)</option>
+                    </select>
+                </div>
+
+                <!-- 3. Faktor Tekanan & Volume -->
+                <div class="space-y-2 bg-navy-900/60 p-3 rounded-xl border border-slate-800">
+                    <label class="text-xs font-bold text-blue-400 block"><i class="fa-solid fa-compress mr-1"></i>3. Tekanan &amp; Volume Gas</label>
+                    ${rxn.isGas ? `
+                        <select id="ctrl-press-select" class="w-full bg-slate-800 text-xs text-white rounded-lg p-2 outline-none border border-slate-700">
+                            <option value="normal">Tekanan &amp; Volume Normal</option>
+                            <option value="increase">Tekanan Dinaikkan (Vol Perkecil) → Ke Mol Kecil</option>
+                            <option value="decrease">Tekanan Diturunkan (Vol Perbesar) → Ke Mol Besar</option>
+                        </select>
+                    ` : `
+                        <p class="text-[11px] text-slate-400 italic">Reaksi fase larutan (aq). Perubahan tekanan/volume gas tidak memberikan pengaruh signifikan pada model ini.</p>
+                    `}
+                </div>
+
+                <!-- 4. Faktor Katalis -->
+                <div class="flex items-center justify-between p-3 bg-navy-900/60 rounded-xl border border-slate-800">
+                    <label for="ctrl-catalyst-check" class="text-xs font-bold text-purple-400 cursor-pointer">
+                        <i class="fa-solid fa-bolt mr-1"></i>4. Tambahkan Katalis
+                    </label>
+                    <input type="checkbox" id="ctrl-catalyst-check" class="w-4 h-4 accent-purple-500 cursor-pointer">
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        /* LOGIKA LE CHATELIER EVALUATOR */
+        function calculateLeChatelierResult() {
+            const key = state.activeReactionKey;
+            const rxn = reactionDatabase[key];
+            const p = state.simParams;
+
+            let direction = 'NONE'; // 'RIGHT', 'LEFT', 'NONE'
+            let explanation = '';
+            let changes = {};
+
+            // Default all substances to 'SAME'
+            rxn.substances.forEach(s => changes[s.id] = 'SAME');
+
+            // 1. Check Catalyst first (no shift)
+            if (p.catalyst && p.targetSubstance === 'none' && p.tempAction === 'normal' && (p.pressureAction === 'normal' || !rxn.isGas)) {
+                direction = 'NONE';
+                explanation = 'Penambahan katalis mempercepat laju reaksi maju dan balik secara seimbang, sehingga kesetimbangan baru tercapai lebih cepat tanpa menggeser posisi kesetimbangan.';
+                rxn.substances.forEach(s => changes[s.id] = 'SAME');
+                return { direction, explanation, changes };
+            }
+
+            // 2. Evaluate Concentration
+            if (p.targetSubstance !== 'none' && p.substanceAction !== 'none') {
+                const sub = rxn.substances.find(s => s.id === p.targetSubstance);
+                if (sub) {
+                    if (sub.role === 'reactant') {
+                        if (p.substanceAction === 'add') {
+                            direction = 'RIGHT';
+                            explanation = `Ketika konsentrasi reaktan (${sub.name}) ditambahkan, sistem merespons dengan mengurangi penambahan tersebut melalui pembentukan produk. Kesetimbangan bergeser ke KANAN.`;
+                        } else {
+                            direction = 'LEFT';
+                            explanation = `Ketika konsentrasi reaktan (${sub.name}) dikurangi, sistem merespons dengan membentuk kembali reaktan tersebut. Kesetimbangan bergeser ke KIRI.`;
+                        }
+                    } else { // Product
+                        if (p.substanceAction === 'add') {
+                            direction = 'LEFT';
+                            explanation = `Ketika konsentrasi produk (${sub.name}) ditambahkan, sistem merespons dengan mengonsumsinya kembali menjadi reaktan. Kesetimbangan bergeser ke KIRI.`;
+                        } else {
+                            direction = 'RIGHT';
+                            explanation = `Ketika konsentrasi produk (${sub.name}) dikurangi, sistem merespons dengan membentuk lebih banyak produk. Kesetimbangan bergeser ke KANAN.`;
+                        }
+                    }
+                }
+            } 
+            // 3. Evaluate Temperature
+            else if (p.tempAction !== 'normal') {
+                if (p.tempAction === 'increase') { // Shift to Endothermic (LEFT for these exothermic reactions)
+                    direction = 'LEFT';
+                    explanation = 'Suhu dinaikkan menyebabkan sistem merespons dengan menyerap kalor berlebih, sehingga kesetimbangan bergeser ke arah ENDOTERM (ke KIRI).';
+                } else { // Shift to Exothermic (RIGHT)
+                    direction = 'RIGHT';
+                    explanation = 'Suhu diturunkan menyebabkan sistem merespons dengan melepaskan kalor, sehingga kesetimbangan bergeser ke arah EKSOTERM (ke KANAN).';
+                }
+            }
+            // 4. Evaluate Pressure / Volume (For Gases)
+            else if (rxn.isGas && p.pressureAction !== 'normal') {
+                if (p.pressureAction === 'increase') {
+                    if (rxn.rightMol < rxn.leftMol) {
+                        direction = 'RIGHT';
+                        explanation = `Tekanan dinaikkan (volume diperkecil) menggeser kesetimbangan ke ruas dengan jumlah mol gas lebih sedikit (Ruas Kanan: ${rxn.rightMol} mol < Ruas Kiri: ${rxn.leftMol} mol).`;
+                    } else if (rxn.rightMol > rxn.leftMol) {
+                        direction = 'LEFT';
+                        explanation = `Tekanan dinaikkan menggeser kesetimbangan ke ruas dengan jumlah mol gas lebih sedikit (Ruas Kiri).`;
+                    }
+                } else { // Decrease pressure
+                    if (rxn.leftMol > rxn.rightMol) {
+                        direction = 'LEFT';
+                        explanation = `Tekanan diturunkan (volume diperbesar) menggeser kesetimbangan ke ruas dengan jumlah mol gas lebih banyak (Ruas Kiri: ${rxn.leftMol} mol).`;
+                    } else {
+                        direction = 'RIGHT';
+                        explanation = `Tekanan diturunkan menggeser kesetimbangan ke ruas dengan jumlah mol gas lebih banyak.`;
+                    }
+                }
+            } else {
+                explanation = 'Sistem berada dalam keadaan setimbang dinamis awal tanpa perlakuan gangguan.';
+            }
+
+            // Determine final net changes compared to initial equilibrium
+            rxn.substances.forEach(s => {
+                if (direction === 'RIGHT') {
+                    if (s.role === 'reactant') {
+                        // If specifically added, net might still be higher, but shift consumes it.
+                        changes[s.id] = (s.id === p.targetSubstance && p.substanceAction === 'add') ? 'INCREASED' : 'DECREASED';
+                    } else {
+                        changes[s.id] = 'INCREASED';
+                    }
+                } else if (direction === 'LEFT') {
+                    if (s.role === 'reactant') {
+                        changes[s.id] = 'INCREASED';
+                    } else {
+                        changes[s.id] = (s.id === p.targetSubstance && p.substanceAction === 'add') ? 'INCREASED' : 'DECREASED';
+                    }
+                } else {
+                    changes[s.id] = 'SAME';
+                }
+            });
+
+            return { direction, explanation, changes };
+        }
+
+        function updateSimulationVisuals() {
+            const rxnKey = state.activeReactionKey;
+            const rxn = reactionDatabase[rxnKey];
+            const result = calculateLeChatelierResult();
+            state.simResult = result;
+
+            // 1. Update Direction Badge
+            const badge = document.getElementById('shift-direction-badge');
+            if (result.direction === 'RIGHT') {
+                badge.className = 'px-3.5 py-1.5 rounded-full text-sm font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                badge.innerHTML = '<i class="fa-solid fa-arrow-right mr-1.5"></i>BERGESER KE KANAN (PRODUK →)';
+            } else if (result.direction === 'LEFT') {
+                badge.className = 'px-3.5 py-1.5 rounded-full text-sm font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+                badge.innerHTML = '<i class="fa-solid fa-arrow-left mr-1.5"></i>BERGESER KE KIRI (PEREAKSI ←)';
+            } else {
+                badge.className = 'px-3.5 py-1.5 rounded-full text-sm font-extrabold bg-slate-700 text-slate-300 border border-slate-600';
+                badge.innerHTML = 'TIDAK TERJADI PERGESERAN';
+            }
+
+            // 2. Explanation Text
+            document.getElementById('shift-explanation-text').innerText = result.explanation;
+
+            // 3. Update Table Body
+            const tbody = document.getElementById('sim-substance-table-body');
+            tbody.innerHTML = rxn.substances.map(s => {
+                const status = result.changes[s.id];
+                let label = '';
+                if (status === 'INCREASED') {
+                    label = '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-arrow-up mr-1"></i>Bertambah (↑)</span>';
+                } else if (status === 'DECREASED') {
+                    label = '<span class="text-rose-400 font-bold"><i class="fa-solid fa-arrow-down mr-1"></i>Berkurang (↓)</span>';
+                } else {
+                    label = '<span class="text-slate-400"><i class="fa-solid fa-minus mr-1"></i>Tidak Berubah akibat pergeseran</span>';
+                }
+                return `
+                    <tr>
+                        <td class="py-2 px-2 font-mono font-bold">${s.name}</td>
+                        <td class="py-2 px-2">${label}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // 4. Update Vessel Visual Fluid Color
+            const vesselFluid = document.getElementById('vessel-fluid');
+            if (rxnKey === 'fe-scn') {
+                if (result.direction === 'RIGHT') {
+                    vesselFluid.style.backgroundColor = 'rgba(185, 28, 28, 0.85)'; // Dark Blood Red
+                } else if (result.direction === 'LEFT') {
+                    vesselFluid.style.backgroundColor = 'rgba(234, 179, 8, 0.85)'; // Yellow
+                } else {
+                    vesselFluid.style.backgroundColor = 'rgba(217, 119, 6, 0.75)'; // Orange neutral
+                }
+            } else if (rxnKey === 'no2-n2o4') {
+                if (result.direction === 'RIGHT') {
+                    vesselFluid.style.backgroundColor = 'rgba(241, 245, 249, 0.15)'; // Colorless clear
+                } else if (result.direction === 'LEFT') {
+                    vesselFluid.style.backgroundColor = 'rgba(180, 83, 9, 0.9)'; // Deep Brown
+                } else {
+                    vesselFluid.style.backgroundColor = 'rgba(180, 83, 9, 0.45)'; // Light Brown
+                }
+            } else if (rxnKey === 'haber') {
+                vesselFluid.style.backgroundColor = result.direction === 'RIGHT' ? 'rgba(168, 85, 247, 0.6)' : 'rgba(59, 130, 246, 0.5)';
+            }
+
+            // 5. Redraw Seesaw & Chart
+            drawSeesawCanvas(result.direction, state.simParams.catalyst);
+            updateChartData(rxn, result);
+        }
+
+        /* ANALOGI JUNGKAT-JUNGKIT CANVAS DRAWING */
+        function drawSeesawCanvas(direction, isCatalyst) {
+            const canvas = document.getElementById('seesaw-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight || 140;
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const centerX = w / 2;
+            const centerY = h / 2 + 15;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Angle calculation
+            let angle = 0;
+            if (direction === 'RIGHT') angle = 0.18; // Tilt down right (producing more right)
+            else if (direction === 'LEFT') angle = -0.18; // Tilt down left
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle);
+
+            // Seesaw Plank
+            ctx.fillStyle = '#38bdf8';
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#06b6d4';
+            ctx.fillRect(-110, -6, 220, 12);
+
+            // Left Bucket (Reaktan)
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(-110, -26, 40, 20);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 10px Inter';
+            ctx.fillText('REAKTAN', -108, -12);
+
+            // Right Bucket (Produk)
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(70, -26, 40, 20);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('PRODUK', 72, -12);
+
+            ctx.restore();
+
+            // Seesaw Base Fulcrum (Triangle)
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX - 20, centerY + 35);
+            ctx.lineTo(centerX + 20, centerY + 35);
+            ctx.closePath();
+            ctx.fillStyle = '#64748b';
+            ctx.fill();
+
+            // Status Tag text
+            const tag = document.getElementById('seesaw-status-tag');
+            if (isCatalyst) {
+                tag.innerText = 'Katalis (Reaksi Cepat, Posisi Tetap)';
+                tag.className = 'text-xs font-normal px-2 py-0.5 rounded bg-purple-500/20 text-purple-300';
+            } else if (direction === 'RIGHT') {
+                tag.innerText = 'Miring Ke Produk (Kanan →)';
+                tag.className = 'text-xs font-normal px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300';
+            } else if (direction === 'LEFT') {
+                tag.innerText = 'Miring Ke Reaktan (Kiri ←)';
+                tag.className = 'text-xs font-normal px-2 py-0.5 rounded bg-rose-500/20 text-rose-300';
+            } else {
+                tag.innerText = 'Setimbang Dinamis Awal';
+                tag.className = 'text-xs font-normal px-2 py-0.5 rounded bg-slate-700 text-slate-300';
+            }
+        }
+
+        /* UPDATE CHART DATA FOR CHART.JS */
+        function updateChartData(rxn, result) {
+            if (!chartInstance) return;
+
+            const datasets = rxn.substances.map(s => {
+                let initConc = 1.0;
+                let step1 = 1.0;
+                let step2 = 1.0;
+                let step3 = 1.0;
+
+                const change = result.changes[s.id];
+                if (change === 'INCREASED') {
+                    step2 = 1.3;
+                    step3 = 1.4;
+                } else if (change === 'DECREASED') {
+                    step2 = 0.7;
+                    step3 = 0.6;
+                }
+
+                return {
+                    label: s.name,
+                    data: [initConc, step1, step2, step3],
+                    borderColor: s.color,
+                    backgroundColor: s.color + '22',
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 2.5
+                };
+            });
+
+            chartInstance.data.datasets = datasets;
+            chartInstance.update();
+        }
+
+        function setGraphExplanationPhase(phase) {
+            const box = document.getElementById('chart-phase-explanation');
+            if (phase === 'before') {
+                box.innerHTML = '<strong class="text-cyan-400">1. Sebelum Gangguan (t₀):</strong> Garis mendatar sempurna menunjukkan laju reaksi maju dan balik sama. Konsentrasi seluruh zat tetap konstan.';
+            } else if (phase === 'during') {
+                box.innerHTML = '<strong class="text-cyan-400">2. Saat Gangguan (t₁–t₂):</strong> Terjadi perubahan konsentrasi (naik/turun) sebagai respon sistem Le Chatelier untuk meminimalkan aksi luar.';
+            } else if (phase === 'after') {
+                box.innerHTML = '<strong class="text-cyan-400">3. Setelah Setimbang Baru (t₃):</strong> Garis kembali mendatar. Sistem telah mencapai posisi kesetimbangan baru.';
+            }
+        }
+
+        /* ==========================================================================
+           QUIZ & EVALUATION DATA
+           ========================================================================== */
+        const quizQuestions = [
+            {
+                q: "Apa yang terjadi pada reaksi kesetimbangan berikut jika suhu dinaikkan? <br><code class='text-cyan-400'>A(g) + B(g) ⇌ C(g)  ΔH = −50 kJ</code>",
+                options: [
+                    "Kesetimbangan bergeser ke kanan, C bertambah",
+                    "Kesetimbangan bergeser ke kiri, A dan B bertambah",
+                    "Kesetimbangan tidak bergeser sama sekali",
+                    "Nilai tetapan kesetimbangan bertambah"
+                ],
+                correct: 1,
+                exp: "Reaksi pembentukan C bersifat eksoterm (ΔH = −). Jika suhu dinaikkan, kesetimbangan bergeser ke arah endoterm (ke kiri/reaktan)."
+            },
+            {
+                q: "Pada reaksi gas <code class='text-cyan-400'>2A(g) + B(g) ⇌ 2C(g)</code>, jika tekanan diperbesar maka reaksi bergeser ke...",
+                options: [
+                    "Kanan, karena jumlah koefisien gas kanan (2) lebih kecil dari kiri (3)",
+                    "Kiri, karena koefisien reaktan lebih besar",
+                    "Kanan, karena volume bertambah",
+                    "Tetap tidak berubah"
+                ],
+                correct: 0,
+                exp: "Peningkatan tekanan menggeser kesetimbangan ke ruas dengan jumlah mol gas lebih kecil (Ruas Kanan = 2 mol, Ruas Kiri = 3 mol)."
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            let html = '';
+            quizQuestions.forEach((item, idx) => {
+                html += `
+                    <div class="space-y-3 pb-6 border-b border-slate-700/60 last:border-0">
+                        <h4 class="font-bold text-slate-100 flex items-start gap-2">
+                            <span class="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-xs">${idx+1}</span>
+                            <span>${item.q}</span>
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-2 text-xs">
+                            ${item.options.map((opt, oIdx) => `
+                                <button onclick="checkQuizAnswer(${idx}, ${oIdx})" class="quiz-opt-${idx} text-left p-3 bg-navy-900 hover:bg-slate-800 rounded-xl border border-slate-700 transition">
+                                    ${String.fromCharCode(65+oIdx)}. ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="quiz-exp-${idx}" class="hidden p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-xs text-cyan-300">
+                            <strong>Pembahasan:</strong> ${item.exp}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function checkQuizAnswer(qIdx, selectedIdx) {
+            const item = quizQuestions[qIdx];
+            const buttons = document.querySelectorAll(`.quiz-opt-${qIdx}`);
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === item.correct) {
+                    btn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-300');
+                }
+            });
+            document.getElementById(`quiz-exp-${qIdx}`).classList.remove('hidden');
+        }
+
+        /* ==========================================================================
+           GLOSSARY DATA
+           ========================================================================== */
+        const glossaryData = [
+            { term: "Asas Le Chatelier", def: "Prinsip kimia yang menyatakan bahwa jika sistem setimbang diberi gangguan luar (aksi), sistem akan merespon untuk meminimalkan gangguan tersebut (reaksi)." },
+            { term: "Kesetimbangan Dinamis", def: "Keadaan di mana laju reaksi maju sama dengan laju reaksi balik, serta konsentrasi reaktan dan produk konstan secara makroskopis." },
+            { term: "Reaksi Reversibel", def: "Reaksi bolak-balik di mana produk dapat bereaksi kembali membentuk reaktan semula." },
+            { term: "Kesetimbangan Homogen", def: "Sistem kesetimbangan di mana semua zat yang terlibat dalam reaksi memiliki fase/wujud yang sama." },
+            { term: "Kesetimbangan Heterogen", def: "Sistem kesetimbangan yang terdiri dari dua atau lebih fase zat yang berbeda." },
+            { term: "Reaksi Eksoterm", def: "Reaksi yang membebaskan kalor ke lingkungan (ΔH bernilai negatif)." },
+            { term: "Reaksi Endoterm", def: "Reaksi yang menyerap kalor dari lingkungan (ΔH bernilai positif)." },
+            { term: "Katalis", def: "Zat yang mempercepat laju pencapaian kesetimbangan tanpa mengubah posisi kesetimbangan atau jumlah produk." }
+        ];
+
+        function renderGlossary(filter = '') {
+            const container = document.getElementById('glossary-list');
+            const filtered = glossaryData.filter(g => g.term.toLowerCase().includes(filter.toLowerCase()) || g.def.toLowerCase().includes(filter.toLowerCase()));
+            
+            container.innerHTML = filtered.map(g => `
+                <div class="glass-panel p-5 rounded-2xl border border-slate-700/80 hover:border-cyan-500/40 transition">
+                    <h4 class="font-bold text-cyan-400 text-lg mb-2 flex items-center space-x-2">
+                        <i class="fa-solid fa-bookmark text-xs"></i> <span>${g.term}</span>
+                    </h4>
+                    <p class="text-slate-300 text-sm leading-relaxed">${g.def}</p>
+                </div>
+            `).join('');
+        }
+
+        /* Helper for collapsible solutions */
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        /* ==========================================================================
+           INITIALIZATION & EVENT BINDING
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            // Sidebar Navigation Event Listeners
+            document.querySelectorAll('.nav-link, a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href && href.startsWith('#')) {
+                        e.preventDefault();
+                        const pageId = href.replace('#', '');
+                        navigateTo(pageId);
+                    }
+                });
+            });
+
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            });
+
+            // Reaction Select Change Listener
+            document.getElementById('reaction-select').addEventListener('change', (e) => {
+                state.activeReactionKey = e.target.value;
+                updateSimulationControlsUI();
+                updateSimulationVisuals();
+            });
+
+            // Apply Simulation Button Listener
+            document.getElementById('apply-sim-btn').addEventListener('click', () => {
+                const subSel = document.getElementById('ctrl-substance-select');
+                const actSel = document.getElementById('ctrl-action-select');
+                const tempSel = document.getElementById('ctrl-temp-select');
+                const pressSel = document.getElementById('ctrl-press-select');
+                const catCheck = document.getElementById('ctrl-catalyst-check');
+
+                state.simParams = {
+                    targetSubstance: subSel ? subSel.value : 'none',
+                    substanceAction: actSel ? actSel.value : 'none',
+                    tempAction: tempSel ? tempSel.value : 'normal',
+                    pressureAction: pressSel ? pressSel.value : 'normal',
+                    catalyst: catCheck ? catCheck.checked : false
+                };
+
+                updateSimulationVisuals();
+            });
+
+            // Reset Simulation Button Listener
+            document.getElementById('reset-sim-btn').addEventListener('click', () => {
+                state.simParams = {
+                    targetSubstance: 'none',
+                    substanceAction: 'none',
+                    tempAction: 'normal',
+                    pressureAction: 'normal',
+                    catalyst: false
+                };
+                updateSimulationControlsUI();
+                updateSimulationVisuals();
+            });
+
+            // Glossary Search Event
+            document.getElementById('glossary-search').addEventListener('input', (e) => {
+                renderGlossary(e.target.value);
+            });
+
+            // Initial Render
+            updateSimulationControlsUI();
+            renderQuiz();
+            renderGlossary();
+            navigateTo('home');
+
+            // Hero Canvas Molecule Animation
+            initMoleculeCanvas();
+        });
+
+        /* Hero Molecule Background Animation */
+        function initMoleculeCanvas() {
+            const canvas = document.getElementById('hero-molecule-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight || 280;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const particles = Array.from({ length: 25 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: (Math.random() - 0.5) * 1.5,
+                radius: Math.random() * 4 + 3,
+                color: Math.random() > 0.5 ? '#22d3ee' : '#3b82f6'
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+
+                    // Draw connecting bond lines
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                        if (dist < 90) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = `rgba(34, 211, 238, ${1 - dist / 90})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
